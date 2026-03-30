@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 1. Database - Thay thế cho XAMPP
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_DATABASE: devops_db
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3306:3306"
+
+  # 2. Backend của Phát
+  backend:
+    build: ./backend
+    container_name: backend_app
+    image: heromatna/devops-backend:v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_NAME=devops_db
+      - PORT=3000
+
+  # 3. Frontend (Nếu Phát đã có thư mục frontend)
+  frontend:
+    image: nginx:alpine
+    container_name: frontend_app
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
